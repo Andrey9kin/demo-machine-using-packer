@@ -6,3 +6,7 @@ packer_cache/
 
 # Emacs
 *~
+
+#vim
+*.swp
+*.txt
