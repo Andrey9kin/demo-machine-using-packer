@@ -1,6 +1,7 @@
 {
   "variables": {
-    "do_api_token": "{{env `TOKEN`}}"
+    "do_api_token": "{{env `TOKEN`}}",
+    "key":          "{{env `KEY`}}"
   },
   "builders": [{
     "type":         "digitalocean",
@@ -11,6 +12,11 @@
     "size":         "4gb"
   }],
   "provisioners": [{
+    "type": "file",
+    "source": "{{user `key`}}",
+    "destination": "/root/id_rsa.pub"
+  },
+  {
     "type": "shell",
     "inline": [
       "apt-get update",
@@ -23,7 +29,14 @@
       "apt-get install -y python-pip emacs",
       "systemctl status docker",
       "pip install docker-compose==1.10",
-      "ssh-keygen -f $HOME/.ssh/id_rsa -t rsa -N ''"
+      "groupadd -g 1000 jenkins",
+      "useradd -d /home/jenkins -u 1000 -g 1000 -m -s /bin/bash jenkins",
+      "ssh-keygen -f $HOME/.ssh/id_rsa -t rsa -N ''",
+      "cp -rf $HOME/.ssh /home/jenkins/",
+      "chown -R jenkins:jenkins /home/jenkins/.ssh",
+      "usermod -aG docker jenkins",
+      "cat /root/id_rsa.pub >> /home/jenkins/.ssh/authorized_keys",
+      "rm -rf /root/id_rsa.pub"
     ]
   }]
 }

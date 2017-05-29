@@ -14,6 +14,9 @@ while [  ${COUNTER} -lt $NUM ]; do
     let COUNTER=COUNTER+1 
 done
 
+echo "Waiting for machines to start..."
+sleep 20
+
 digitalocean-cli droplet list 2>&1 | grep doj-gbg |awk '{printf "%-50s %s\n", $1,  $3}' > machines.txt
 
 echo Created machines
