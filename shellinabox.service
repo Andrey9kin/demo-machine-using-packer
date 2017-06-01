@@ -1,0 +1,6 @@
+[Unit]
+Description=shell in a box starter
+
+[Service]
+ExecStart=/usr/local/bin/shellinaboxd -t -g 1000 -u 1000
+Restart=always

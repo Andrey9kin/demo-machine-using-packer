@@ -1,7 +1,6 @@
 {
   "variables": {
-    "do_api_token": "{{env `TOKEN`}}",
-    "key":          "{{env `KEY`}}"
+    "do_api_token": "{{env `TOKEN`}}"
   },
   "builders": [{
     "type":         "digitalocean",
@@ -11,10 +10,11 @@
     "region":       "ams3",
     "size":         "4gb"
   }],
-  "provisioners": [{
+  "provisioners": [
+  {
     "type": "file",
-    "source": "{{user `key`}}",
-    "destination": "/root/id_rsa.pub"
+    "source": "./shellinabox.service",
+    "destination": "/etc/systemd/system/shellinabox.service"
   },
   {
     "type": "shell",
@@ -26,17 +26,22 @@
       "add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
       "apt-get update",
       "apt-get install -y docker-ce",
-      "apt-get install -y python-pip emacs",
+      "apt-get install -y python-pip emacs git htop",
       "systemctl status docker",
       "pip install docker-compose==1.10",
       "groupadd -g 1000 jenkins",
       "useradd -d /home/jenkins -u 1000 -g 1000 -m -s /bin/bash jenkins",
+      "echo 'jenkins:doj2017oslo' | chpasswd",
       "ssh-keygen -f $HOME/.ssh/id_rsa -t rsa -N ''",
       "cp -rf $HOME/.ssh /home/jenkins/",
       "chown -R jenkins:jenkins /home/jenkins/.ssh",
       "usermod -aG docker jenkins",
-      "cat /root/id_rsa.pub >> /home/jenkins/.ssh/authorized_keys",
-      "rm -rf /root/id_rsa.pub"
+      "apt-get install -y libssl-dev libpam0g-dev zlib1g-dev dh-autoreconf",
+      "git clone https://github.com/shellinabox/shellinabox.git",
+      "cd shellinabox && autoreconf -i &&  ./configure && make && make install",
+      "systemctl daemon-reload",
+      "systemctl enable shellinabox.service",
+      "systemctl start shellinabox.service"
     ]
   }]
 }

@@ -10,3 +10,6 @@ packer_cache/
 #vim
 *.swp
 *.txt
+
+*.tfstate
+*.tfstate.*
